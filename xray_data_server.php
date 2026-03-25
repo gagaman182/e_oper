@@ -6,11 +6,14 @@ header('Content-Type: application/json; charset=utf-8');
 $columns = array(
     0 => "XRAY_CODE",
     1 => "XRAY_CODE",
-    2 => "NAME",
-    3 => "FUND_UNIT_PRICE",
-    4 => "COPAY_UNIT_PRICE",
-    5 => "MIN_PRICE",
-    6 => "MAX_PRICE"
+    2 => "REF_CODE",
+    3 => "CODE_30",
+    4 => "NAME",
+    5 => "XRAY_CODE", // CHECK button index
+    6 => "FUND_UNIT_PRICE",
+    7 => "COPAY_UNIT_PRICE",
+    8 => "MIN_PRICE",
+    9 => "MAX_PRICE"
 );
 
 $start      = isset($_GET['start']) ? intval($_GET['start']) : 0;
@@ -41,7 +44,7 @@ $totalData = isset($row_total['CNT']) ? intval($row_total['CNT']) : 0;
 $sql = "
     SELECT * FROM (
         SELECT ROWNUM AS RN, A.* FROM (
-            SELECT XRAY_CODE, NAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE
+            SELECT XRAY_CODE, NAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE, REF_CODE, CODE_30
             FROM XRAY_CODES
             $where
             ORDER BY $order_by $order_dir
@@ -71,7 +74,10 @@ while ($row = oci_fetch_array($stmt, OCI_ASSOC + OCI_RETURN_NULLS)) {
     $data[] = array(
         str_pad($i++, 5, "0", STR_PAD_LEFT),
         isset($row['XRAY_CODE']) ? $row['XRAY_CODE'] : '',
+        isset($row['REF_CODE']) ? $row['REF_CODE'] : '',
+        isset($row['CODE_30']) ? $row['CODE_30'] : '',
         isset($row['NAME']) ? $row['NAME'] : '',
+        // ปุ่ม CHECK จะ render ใน JS
         isset($row['FUND_UNIT_PRICE']) ? number_format((float)$row['FUND_UNIT_PRICE'], 2) : '',
         isset($row['COPAY_UNIT_PRICE']) ? number_format((float)$row['COPAY_UNIT_PRICE'], 2) : '',
         isset($row['MIN_PRICE']) ? number_format((float)$row['MIN_PRICE'], 2) : '',
