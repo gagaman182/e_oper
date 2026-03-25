@@ -8,11 +8,14 @@ header('Content-Type: application/json');
 $columns = array(
     0 => "LABCODE",
     1 => "LABCODE",
-    2 => "LABNAME",
-    3 => "FUND_UNIT_PRICE",
-    4 => "COPAY_UNIT_PRICE",
-    5 => "MIN_PRICE",
-    6 => "MAX_PRICE"
+    2 => "REF_CODE",
+    3 => "CODE_30",
+    4 => "LABNAME",
+    5 => "LABCODE", // CHECK button index
+    6 => "FUND_UNIT_PRICE",
+    7 => "COPAY_UNIT_PRICE",
+    8 => "MIN_PRICE",
+    9 => "MAX_PRICE"
 );
 
 // ใช้ isset แทน ?? เพื่อรองรับ PHP5
@@ -40,7 +43,7 @@ $totalData = isset($row_total['CNT']) ? intval($row_total['CNT']) : 0;
 $sql = "
     SELECT * FROM (
         SELECT ROWNUM AS RN, A.* FROM (
-            SELECT LABCODE, LABNAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE
+            SELECT LABCODE, LABNAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE, REF_CODE, CODE_30
             FROM LABCODES
             $where
             ORDER BY $order_by $order_dir
@@ -61,7 +64,10 @@ while ($row = oci_fetch_array($stmt, OCI_ASSOC + OCI_RETURN_NULLS)) {
     $data[] = array(
         str_pad($i++, 5, "0", STR_PAD_LEFT),
         isset($row['LABCODE']) ? $row['LABCODE'] : '',
+        isset($row['REF_CODE']) ? $row['REF_CODE'] : '',
+        isset($row['CODE_30']) ? $row['CODE_30'] : '',
         isset($row['LABNAME']) ? $row['LABNAME'] : '',
+        // ปุ่ม CHECK จะ render ใน JS
         isset($row['FUND_UNIT_PRICE']) ? number_format((float)$row['FUND_UNIT_PRICE'], 2) : '',
         isset($row['COPAY_UNIT_PRICE']) ? number_format((float)$row['COPAY_UNIT_PRICE'], 2) : '',
         isset($row['MIN_PRICE']) ? number_format((float)$row['MIN_PRICE'], 2) : '',

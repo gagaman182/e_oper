@@ -19,14 +19,16 @@ include('main_top_panel_head.php');          // ส่วนหัว
             <table id="labTable" class="table table-bordered table-hover table-striped nowrap" style="width:100%">
                 <thead class="table-light text-center align-middle">
                     <tr>
-                        <th style="width: 5%;">#</th>
-                        <th style="width: 12%;">รหัส</th>
-                        <th style="width: 35%;">ชื่อรายการ</th>
+                        <th style="width: 4%;">#</th>
+                        <th style="width: 9%;">รหัส</th>
+                        <th style="width: 10%;">รหัสกรมบัญชีกลาง</th>
+                        <th style="width: 9%;">รหัสสปสช</th>
+                        <th style="width: 28%;">ชื่อรายการ</th>
                         <th style="width: 10%;">ตรวจสอบ</th>
-                        <th style="width: 10%;">ราคาทุน</th>
-                        <th style="width: 10%;">ร่วมจ่าย</th>
-                        <th style="width: 9%;">ต่ำสุด</th>
-                        <th style="width: 9%;">สูงสุด</th>
+                        <th style="width: 8%;">ราคาทุน</th>
+                        <th style="width: 8%;">ร่วมจ่าย</th>
+                        <th style="width: 7%;">ต่ำสุด</th>
+                        <th style="width: 7%;">สูงสุด</th>
                     </tr>
                 </thead>
             </table>
@@ -73,7 +75,7 @@ $(document).ready(function() {
         responsive: true,
         pageLength: 20,
         order: [
-            [2, 'asc']
+            [4, 'asc']
         ],
         dom: '<"d-flex justify-content-between align-items-center mb-3"Bf>rt<"d-flex justify-content-between align-items-center mt-3"lip>',
         buttons: [{
@@ -111,6 +113,12 @@ $(document).ready(function() {
                 data: 2
             },
             {
+                data: 3
+            },
+            {
+                data: 4
+            },
+            {
                 data: null,
                 className: 'text-center',
                 orderable: false,
@@ -129,24 +137,24 @@ $(document).ready(function() {
                 }
             },
             {
-                data: 3
-            },
-            {
-                data: 4
-            },
-            {
                 data: 5
             },
             {
                 data: 6
+            },
+            {
+                data: 7
+            },
+            {
+                data: 8
             }
         ],
         columnDefs: [{
-                targets: [0, 1, 3],
+                targets: [0, 1, 2, 3, 5],
                 className: 'text-center'
             },
             {
-                targets: [4, 5, 6, 7],
+                targets: [6, 7, 8, 9],
                 className: 'text-end'
             }
         ]
@@ -174,7 +182,8 @@ function openStatusModal(code) {
                                     <i class="fa fa-vial me-2"></i> ${d.name}
                                 </h5>
                                 <p><i class="fa fa-barcode me-2 text-muted"></i> <strong>รหัส:</strong> ${d.code}</p>
-                                <p><i class="fa fa-key me-2 text-secondary"></i> <strong>Ref Code:</strong> ${d.ref_code || '-'}</p>
+                                <p><i class="fa fa-key me-2 text-secondary"></i> <strong>รหัสกรมบัญชีกลาง:</strong> ${d.ref_code || '-'}</p>
+                                <p><i class="fa fa-key me-2 text-info"></i> <strong>รหัสสปสช (30 บาท):</strong> ${d.code_30 || '-'}</p>
                                 <p><i class="fa fa-info-circle me-2 text-warning"></i> <strong>ข้อบ่งชี้:</strong> ${d.indication || '-'}</p>
                                 <p><i class="fa fa-cube me-2 text-success"></i> <strong>หน่วยละ:</strong> ${d.unit || '-'}</p>
                                 <p><i class="fa fa-cube me-2 text-success"></i> <strong>ICD-9 :</strong> ${d.icd_9_code || '-'}</p>
