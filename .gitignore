@@ -1,0 +1,25 @@
+# Ignore all folders except db/
+/**/
+!db/
+
+# Environment & Config
+.env
+.env.local
+config.local.php
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+
+# Temp / cache
+*.tmp
+*.cache
+
+# PHP preview router (local dev only)
+.php-preview-router.php

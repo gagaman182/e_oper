@@ -1,0 +1,44 @@
+<?php
+// check_oper_exists.php
+header('Content-Type: application/json; charset=utf-8');
+
+// เชื่อมต่อฐานข้อมูล MySQL (mysqli)
+include('db/connection.php'); // ต้องกำหนดตัวแปร $conn เป็น mysqli
+
+$response = array();
+
+// ตรวจสอบการเชื่อมต่อ
+if (!$conn) {
+    $response['status'] = 'error';
+    $response['message'] = 'ไม่สามารถเชื่อมต่อฐานข้อมูล';
+    echo json_encode($response);
+    exit;
+}
+
+// ดึงเฉพาะรหัสรายการ type = 'P' (Operation)
+$sql = "SELECT code FROM pmk_items WHERE type = 'P'";
+$result = mysqli_query($conn, $sql);
+
+if (!$result) {
+    $response['status'] = 'error';
+    $response['message'] = 'เกิดข้อผิดพลาดในการ query ฐานข้อมูล';
+    echo json_encode($response);
+    exit;
+}
+
+// วนลูปเก็บรหัสรายการ
+$codes = array();
+while ($row = mysqli_fetch_assoc($result)) {
+    $codes[] = $row['code'];
+}
+
+// ส่งผลลัพธ์กลับ
+$response['status'] = 'success';
+$response['codes'] = $codes;
+
+echo json_encode($response);
+
+// ปิดการเชื่อมต่อ
+mysqli_free_result($result);
+mysqli_close($conn);
+?>

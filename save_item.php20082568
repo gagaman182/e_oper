@@ -1,0 +1,98 @@
+<?php
+header('Content-Type: application/json; charset=utf-8');
+include './db/connection.php'; // ใช้ตัวแปร $conn แบบ mysqli procedural
+
+if (!isset($conn) || !$conn) {
+    echo json_encode(array('status' => 'error', 'message' => 'ไม่สามารถเชื่อมต่อฐานข้อมูล'));
+    exit;
+}
+
+// รับข้อมูล
+$code                = isset($_POST['code']) ? trim($_POST['code']) : '';
+$ref_code            = isset($_POST['ref_code']) ? trim($_POST['ref_code']) : '';
+$type                = isset($_POST['type']) ? trim($_POST['type']) : '';
+$name                = isset($_POST['name']) ? trim($_POST['name']) : '';
+$fund_price          = isset($_POST['fund_price']) ? floatval($_POST['fund_price']) : 0;
+$copay_price         = isset($_POST['copay_price']) ? floatval($_POST['copay_price']) : 0;
+$min_price           = isset($_POST['min_price']) ? floatval($_POST['min_price']) : 0;
+$max_price           = isset($_POST['max_price']) ? floatval($_POST['max_price']) : 0;
+$price_uc_opd        = isset($_POST['price_uc_opd']) ? floatval($_POST['price_uc_opd']) : 0;
+$price_uc_ipd        = isset($_POST['price_uc_ipd']) ? floatval($_POST['price_uc_ipd']) : 0;
+$price_officer_opd   = isset($_POST['price_officer_opd']) ? floatval($_POST['price_officer_opd']) : 0;
+$price_officer_ipd   = isset($_POST['price_officer_ipd']) ? floatval($_POST['price_officer_ipd']) : 0;
+$price_sss_opd       = isset($_POST['price_sss_opd']) ? floatval($_POST['price_sss_opd']) : 0;
+$price_sss_ipd       = isset($_POST['price_sss_ipd']) ? floatval($_POST['price_sss_ipd']) : 0;
+$price_foreign_opd   = isset($_POST['price_foreign_opd']) ? floatval($_POST['price_foreign_opd']) : 0;
+$price_foreign_ipd   = isset($_POST['price_foreign_ipd']) ? floatval($_POST['price_foreign_ipd']) : 0;
+$price_sks           = isset($_POST['price_sks']) ? floatval($_POST['price_sks']) : 0;
+$unit                = isset($_POST['unit']) ? trim($_POST['unit']) : '';
+$indication          = isset($_POST['indication']) ? trim($_POST['indication']) : '';
+$icd_9_code          = isset($_POST['icd_9']) ? trim($_POST['icd_9']) : '';
+
+if ($code == '' || $type == '' || $name == '') {
+    echo json_encode(array('status' => 'error', 'message' => 'ข้อมูลไม่ครบถ้วน: รหัส, ประเภท, ชื่อรายการต้องระบุ'));
+    exit;
+}
+
+$now = date('Y-m-d H:i:s');
+
+// ตรวจสอบว่ามีอยู่แล้วหรือไม่
+$sql_check = "SELECT id FROM pmk_items WHERE code = ? AND type = ?";
+$stmt_check = mysqli_prepare($conn, $sql_check);
+mysqli_stmt_bind_param($stmt_check, 'ss', $code, $type);
+mysqli_stmt_execute($stmt_check);
+mysqli_stmt_store_result($stmt_check);
+
+if (mysqli_stmt_num_rows($stmt_check) > 0) {
+    // UPDATE
+    $sql_update = "UPDATE pmk_items SET 
+        name = ?, ref_code = ?, fund_price = ?, copay_price = ?, min_price = ?, max_price = ?,
+        price_uc_opd = ?, price_uc_ipd = ?, price_officer_opd = ?, price_officer_ipd = ?,
+        price_sss_opd = ?, price_sss_ipd = ?, price_foreign_opd = ?, price_foreign_ipd = ?, price_sks = ?,
+        unit = ?, indication = ?, updated_at = ?, icd_9_code = ?
+        WHERE code = ? AND type = ?";
+    
+    $stmt = mysqli_prepare($conn, $sql_update);
+    mysqli_stmt_bind_param(
+        $stmt,
+        'ssddddddddddddddsssss',
+        $name, $ref_code, $fund_price, $copay_price, $min_price, $max_price,
+        $price_uc_opd, $price_uc_ipd, $price_officer_opd, $price_officer_ipd,
+        $price_sss_opd, $price_sss_ipd, $price_foreign_opd, $price_foreign_ipd, $price_sks,
+        $unit, $indication, $now, $icd_9_code, // updated_at, icd_9_code
+        $code, $type
+    );
+    $action = 'แก้ไขข้อมูลสำเร็จ';
+} else {
+    // INSERT
+    $sql_insert = "INSERT INTO pmk_items (
+        code, type, name, ref_code, fund_price, copay_price, min_price, max_price,
+        price_uc_opd, price_uc_ipd, price_officer_opd, price_officer_ipd,
+        price_sss_opd, price_sss_ipd, price_foreign_opd, price_foreign_ipd, price_sks,
+        unit, indication, created_at, updated_at, icd_9_code
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    $stmt = mysqli_prepare($conn, $sql_insert);
+    mysqli_stmt_bind_param(
+        $stmt,
+        'ssssddddddddddddddsssss',
+        $code, $type, $name, $ref_code,
+        $fund_price, $copay_price, $min_price, $max_price,
+        $price_uc_opd, $price_uc_ipd, $price_officer_opd, $price_officer_ipd,
+        $price_sss_opd, $price_sss_ipd, $price_foreign_opd, $price_foreign_ipd, $price_sks,
+        $unit, $indication, $now, $now, $icd_9_code
+    );
+    $action = 'เพิ่มข้อมูลสำเร็จ';
+}
+
+// ดำเนินการ execute
+if (mysqli_stmt_execute($stmt)) {
+    echo json_encode(array('status' => 'success', 'message' => $action));
+} else {
+    echo json_encode(array('status' => 'error', 'message' => 'ไม่สามารถบันทึกข้อมูลได้: ' . mysqli_stmt_error($stmt)));
+}
+
+mysqli_stmt_close($stmt_check);
+mysqli_stmt_close($stmt);
+mysqli_close($conn);
+?>

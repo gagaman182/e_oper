@@ -1,0 +1,26 @@
+<?php
+require_once("./db/connect_pmk.php");
+header('Content-Type: application/json');
+
+$sql = "SELECT XRAY_CODE, NAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE
+        FROM XRAY_CODES 
+        WHERE DEL_FLAG IS NULL 
+        ORDER BY NAME";
+
+$objParse = oci_parse($objConnect, $sql);
+oci_execute($objParse);
+
+$data = [];
+$i = 1;
+while ($row = oci_fetch_array($objParse, OCI_ASSOC + OCI_RETURN_NULLS)) {
+    $data[] = [
+        str_pad($i++, 5, "0", STR_PAD_LEFT),
+        htmlspecialchars($row['XRAY_CODE']),
+        htmlspecialchars($row['NAME']),
+        number_format((float)$row['FUND_UNIT_PRICE'], 2),
+        number_format((float)$row['COPAY_UNIT_PRICE'], 2),
+        number_format((float)$row['MIN_PRICE'], 2),
+        number_format((float)$row['MAX_PRICE'], 2)
+    ];
+}
+echo json_encode(["data" => $data]);
