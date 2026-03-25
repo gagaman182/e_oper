@@ -7,11 +7,14 @@ header('Content-Type: application/json');
 $columns = array(
     0 => "CODE",
     1 => "CODE",
-    2 => "NAME",
-    3 => "MIN_PRICE",
-    4 => "MAX_PRICE",
-    5 => "FUND_UNIT_PRICE",
-    6 => "COPAY_UNIT_PRICE"
+    2 => "REF_CODE",
+    3 => "CODE_30",
+    4 => "NAME",
+    5 => "CODE", // CHECK button index
+    6 => "FUND_UNIT_PRICE",
+    7 => "COPAY_UNIT_PRICE",
+    8 => "MIN_PRICE",
+    9 => "MAX_PRICE"
 );
 
 $start = isset($_GET['start']) ? intval($_GET['start']) : 0;
@@ -35,7 +38,7 @@ $totalData = isset($row_total['CNT']) ? intval($row_total['CNT']) : 0;
 $sql = "
 SELECT * FROM (
     SELECT ROWNUM AS RN, A.* FROM (
-        SELECT CODE, NAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE
+        SELECT CODE, NAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE, REF_CODE, CODE_30
         FROM SERVICE_CODES 
         $where 
         ORDER BY $order_by $order_dir
@@ -53,13 +56,15 @@ $data = array();
 $i = $start + 1;
 while ($row = oci_fetch_array($stmt, OCI_ASSOC + OCI_RETURN_NULLS)) {
     $data[] = array(
-        str_pad($i++, 5, "0", STR_PAD_LEFT),
-        isset($row['CODE']) ? $row['CODE'] : '',
-        isset($row['NAME']) ? $row['NAME'] : '',
-        isset($row['FUND_UNIT_PRICE']) ? number_format((float)$row['FUND_UNIT_PRICE'], 2) : '',
-        isset($row['COPAY_UNIT_PRICE']) ? number_format((float)$row['COPAY_UNIT_PRICE'], 2) : '',
-        isset($row['MIN_PRICE']) ? number_format((float)$row['MIN_PRICE'], 2) : '',
-        isset($row['MAX_PRICE']) ? number_format((float)$row['MAX_PRICE'], 2) : ''
+        0 => str_pad($i++, 5, "0", STR_PAD_LEFT),
+        1 => isset($row['CODE']) ? $row['CODE'] : '',
+        2 => isset($row['REF_CODE']) ? $row['REF_CODE'] : '',
+        3 => isset($row['CODE_30']) ? $row['CODE_30'] : '',
+        4 => isset($row['NAME']) ? $row['NAME'] : '',
+        5 => isset($row['FUND_UNIT_PRICE']) ? number_format((float)$row['FUND_UNIT_PRICE'], 2) : '',
+        6 => isset($row['COPAY_UNIT_PRICE']) ? number_format((float)$row['COPAY_UNIT_PRICE'], 2) : '',
+        7 => isset($row['MIN_PRICE']) ? number_format((float)$row['MIN_PRICE'], 2) : '',
+        8 => isset($row['MAX_PRICE']) ? number_format((float)$row['MAX_PRICE'], 2) : ''
     );
 }
 

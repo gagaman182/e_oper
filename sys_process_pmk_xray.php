@@ -74,7 +74,7 @@ $(document).ready(function() {
         responsive: true,
         pageLength: 20,
         order: [
-            [2, 'asc']
+            [4, 'asc']
         ],
         dom: '<"d-flex justify-content-between align-items-center mb-3"Bf>rt<"d-flex justify-content-between align-items-center mt-3"lip>',
         buttons: [{
