@@ -7,11 +7,15 @@ header('Content-Type: application/json');
 $columns = array(
     0 => "CODE",
     1 => "CODE",
-    2 => "NAME",
-    3 => "FUND_UNIT_PRICE",
-    4 => "INTEND_FUND_UNIT_PRICE",
-    5 => "SELL_UNIT_PRICE",
-    6 => "IPD_SELL_UNIT_PRICE"
+    2 => "REF_CODE",
+    3 => "CODE_30",
+    4 => "DRUG_STD_CODE",
+    5 => "NAME",
+    6 => "CODE", // CHECK button index
+    7 => "FUND_UNIT_PRICE",
+    8 => "INTEND_FUND_UNIT_PRICE",
+    9 => "SELL_UNIT_PRICE",
+    10 => "IPD_SELL_UNIT_PRICE"
 );
 
 // ใช้ isset แทน ?? เพื่อรองรับ PHP5
@@ -38,7 +42,7 @@ $totalData = isset($row_total['CNT']) ? intval($row_total['CNT']) : 0;
 $sql = "
 SELECT * FROM (
  SELECT ROWNUM AS RN, A.* FROM (
-   SELECT CODE, NAME, FUND_UNIT_PRICE, INTEND_FUND_UNIT_PRICE, SELL_UNIT_PRICE, IPD_SELL_UNIT_PRICE
+   SELECT CODE, NAME, FUND_UNIT_PRICE, INTEND_FUND_UNIT_PRICE, SELL_UNIT_PRICE, IPD_SELL_UNIT_PRICE, REF_CODE, CODE_30, DRUG_STD_CODE
         FROM DRUGCODES 
         $where
         ORDER BY $order_by $order_dir
@@ -55,14 +59,17 @@ oci_execute($stmt);
 $data = array();
 $i = $start + 1;
 while ($row = oci_fetch_array($stmt, OCI_ASSOC + OCI_RETURN_NULLS)) {
-    $data[] =array(
-        str_pad($i++, 5, "0", STR_PAD_LEFT),
-        isset($row['CODE']) ? $row['CODE'] : '',
-        isset($row['NAME']) ? $row['NAME'] : '',
-        isset($row['FUND_UNIT_PRICE']) ? number_format((float)$row['FUND_UNIT_PRICE'], 2) : '',
-        isset($row['INTEND_FUND_UNIT_PRICE']) ? number_format((float)$row['INTEND_FUND_UNIT_PRICE'], 2) : '',
-        isset($row['SELL_UNIT_PRICE']) ? number_format((float)$row['SELL_UNIT_PRICE'], 2) : '',
-        isset($row['IPD_SELL_UNIT_PRICE']) ? number_format((float)$row['IPD_SELL_UNIT_PRICE'], 2) : ''
+    $data[] = array(
+        0 => str_pad($i++, 5, "0", STR_PAD_LEFT),
+        1 => isset($row['CODE']) ? $row['CODE'] : '',
+        2 => isset($row['REF_CODE']) ? $row['REF_CODE'] : '',
+        3 => isset($row['CODE_30']) ? $row['CODE_30'] : '',
+        4 => isset($row['DRUG_STD_CODE']) ? $row['DRUG_STD_CODE'] : '',
+        5 => isset($row['NAME']) ? $row['NAME'] : '',
+        6 => isset($row['FUND_UNIT_PRICE']) ? number_format((float)$row['FUND_UNIT_PRICE'], 2) : '',
+        7 => isset($row['INTEND_FUND_UNIT_PRICE']) ? number_format((float)$row['INTEND_FUND_UNIT_PRICE'], 2) : '',
+        8 => isset($row['SELL_UNIT_PRICE']) ? number_format((float)$row['SELL_UNIT_PRICE'], 2) : '',
+        9 => isset($row['IPD_SELL_UNIT_PRICE']) ? number_format((float)$row['IPD_SELL_UNIT_PRICE'], 2) : ''
     );
 }
 
