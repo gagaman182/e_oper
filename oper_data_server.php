@@ -1,5 +1,7 @@
 <?php
+ob_start();
 require_once("./db/connect_pmk.php");
+ob_clean();
 header('Content-Type: application/json; charset=utf-8');
 
 // รับค่าจาก DataTables
@@ -14,12 +16,14 @@ $orderDir = isset($_GET['order'][0]['dir']) ? $_GET['order'][0]['dir'] : 'asc';
 $columns = [
     0 => 'OPER_CODE',
     1 => 'OPER_CODE',
-    2 => 'NAME',
-    3 => 'OPER_CODE', // ตรวจสอบ ไม่มีจริง
-    4 => 'FUND_UNIT_PRICE',
-    5 => 'COPAY_UNIT_PRICE',
-    6 => 'MIN_PRICE',
-    7 => 'MAX_PRICE'
+    2 => 'REF_CODE',
+    3 => 'CODE_30',
+    4 => 'NAME',
+    5 => 'OPER_CODE', // ปุ่ม CHECK ไม่มีจริง
+    6 => 'FUND_UNIT_PRICE',
+    7 => 'COPAY_UNIT_PRICE',
+    8 => 'MIN_PRICE',
+    9 => 'MAX_PRICE'
 ];
 
 $orderColumn = $columns[$orderColumnIndex];
@@ -50,7 +54,7 @@ $filteredRecords = oci_fetch_assoc($objFiltered)['CNT'];
 $sqlMain = "
     SELECT * FROM (
         SELECT a.*, ROWNUM rnum FROM (
-            SELECT OPER_CODE, NAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE, REF_CODE
+            SELECT OPER_CODE, NAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE, REF_CODE, CODE_30
             FROM OPERATION_CODES
             WHERE DEL_FLAG IS NULL $searchSQL
             ORDER BY $orderColumn $orderDir
@@ -61,7 +65,11 @@ $sqlMain = "
 ";
 
 $objParse = oci_parse($objConnect, $sqlMain);
-oci_execute($objParse);
+if (!oci_execute($objParse)) {
+    $e = oci_error($objParse);
+    echo json_encode(["draw" => $draw, "recordsTotal" => 0, "recordsFiltered" => 0, "data" => [], "error" => $e['message']]);
+    exit;
+}
 
 $data = [];
 $i = $start + 1;
@@ -69,6 +77,8 @@ while ($rs = oci_fetch_array($objParse, OCI_ASSOC + OCI_RETURN_NULLS)) {
     $data[] = [
         str_pad($i++, 5, "0", STR_PAD_LEFT),
         htmlspecialchars($rs['OPER_CODE']),
+        htmlspecialchars(isset($rs['REF_CODE']) ? $rs['REF_CODE'] : ''),
+        htmlspecialchars(isset($rs['CODE_30']) ? $rs['CODE_30'] : ''),
         htmlspecialchars($rs['NAME']),
         // ปุ่ม CHECK จะ render ใน JS (sys_process_pmk_oper.php) โดยอิงจากรหัส
         number_format((float)$rs['FUND_UNIT_PRICE'], 2),

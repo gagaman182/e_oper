@@ -48,6 +48,7 @@ $response['status'] = 'success';
 $response['data'] = array(
     'code'               => $row['code'],
     'ref_code'           => $row['ref_code'],
+    'code_30'            => $row['code_30'],
     'name'               => $row['name'],
     'fund_price'         => $row['fund_price'],
     'copay_price'        => $row['copay_price'],

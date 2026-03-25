@@ -21,14 +21,16 @@ include('main_top_panel_head.php');          // ส่วนหัว
                 style="width:100%; table-layout: fixed;">
                 <thead class="table-light text-center align-middle">
                     <tr>
-                        <th style="width: 5%;">#</th>
-                        <th style="width: 12%;">รหัส</th>
-                        <th style="width: 35%;">ชื่อรายการ</th>
+                        <th style="width: 4%;">#</th>
+                        <th style="width: 9%;">รหัส</th>
+                        <th style="width: 10%;">รหัสกรมบัญชีกลาง</th>
+                        <th style="width: 9%;">รหัสสปสช</th>
+                        <th style="width: 28%;">ชื่อรายการ</th>
                         <th style="width: 10%;">ตรวจสอบ</th>
-                        <th style="width: 10%;">ราคาทุน</th>
-                        <th style="width: 10%;">ร่วมจ่าย</th>
-                        <th style="width: 9%;">ต่ำสุด</th>
-                        <th style="width: 9%;">สูงสุด</th>
+                        <th style="width: 8%;">ราคาทุน</th>
+                        <th style="width: 8%;">ร่วมจ่าย</th>
+                        <th style="width: 7%;">ต่ำสุด</th>
+                        <th style="width: 7%;">สูงสุด</th>
                     </tr>
                 </thead>
             </table>
@@ -112,6 +114,12 @@ $(document).ready(function() {
                 data: 2
             },
             {
+                data: 3
+            },
+            {
+                data: 4
+            },
+            {
                 data: null,
                 className: 'text-center',
                 orderable: false,
@@ -119,7 +127,7 @@ $(document).ready(function() {
                 render: function(data, type, row) {
                     var code = row[1];
                     var isEnabled = existingCodes.indexOf(code) !== -1;
- return `<button
+                    return `<button
     class="btn btn-sm ${isEnabled ? 'btn-success' : 'btn-primary'} d-flex align-items-center gap-1 shadow-sm rounded-pill px-3"
     style="font-size: 0.875rem;"
     onclick="openStatusModal('${code}')" ${isEnabled ? '' : 'disabled'}
@@ -130,24 +138,24 @@ $(document).ready(function() {
                 }
             },
             {
-                data: 3
-            },
-            {
-                data: 4
-            },
-            {
                 data: 5
             },
             {
                 data: 6
+            },
+            {
+                data: 7
+            },
+            {
+                data: 8
             }
         ],
         columnDefs: [{
-                targets: [0, 1, 3],
+                targets: [0, 1, 2, 3, 5],
                 className: 'text-center'
             },
             {
-                targets: [4, 5, 6, 7],
+                targets: [6, 7, 8, 9],
                 className: 'text-end'
             }
         ]
@@ -174,7 +182,8 @@ function openStatusModal(code) {
                                     <i class="fa fa-scalpel me-2"></i> ${d.name}
                                 </h5>
                                 <p><i class="fa fa-barcode me-2 text-muted"></i> <strong>รหัส:</strong> ${d.code}</p>
-                                <p><i class="fa fa-key me-2 text-secondary"></i> <strong>Ref Code:</strong> ${d.ref_code || '-'}</p>
+                                <p><i class="fa fa-key me-2 text-secondary"></i> <strong>รหัสกรมบัญชีกลาง:</strong> ${d.ref_code || '-'}</p>
+                                <p><i class="fa fa-key me-2 text-info"></i> <strong>รหัสสปสช (30 บาท):</strong> ${d.code_30 || '-'}</p>
                                 <p><i class="fa fa-info-circle me-2 text-warning"></i> <strong>ข้อบ่งชี้:</strong> ${d.indication || '-'}</p>
                                 <p><i class="fa fa-cube me-2 text-success"></i> <strong>หน่วยละ:</strong> ${d.unit || '-'}</p>
                                 <p><i class="fa fa-cube me-2 text-success"></i> <strong>ICD-9:</strong> ${d.icd_9_code || '-'}</p>
