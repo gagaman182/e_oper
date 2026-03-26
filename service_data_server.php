@@ -24,9 +24,35 @@ $order_col = isset($_GET['order'][0]['column']) ? intval($_GET['order'][0]['colu
 $order_dir = isset($_GET['order'][0]['dir']) ? $_GET['order'][0]['dir'] : 'asc';
 $order_by = $columns[$order_col];
 
+// รับค่าจากตัวกรองคอลัมน์
+$filterRefCode = isset($_GET['filterRefCode']) ? strtoupper($_GET['filterRefCode']) : '';
+$filterCode30 = isset($_GET['filterCode30']) ? strtoupper($_GET['filterCode30']) : '';
+$filterEmptyRef = isset($_GET['filterEmptyRef']) ? $_GET['filterEmptyRef'] : '';
+$filterEmptyCode30 = isset($_GET['filterEmptyCode30']) ? $_GET['filterEmptyCode30'] : '';
+
 $where = "WHERE DEL_FLAG IS NULL";
 if (!empty($search)) {
     $where .= " AND (UPPER(CODE) LIKE '%$search%' OR UPPER(NAME) LIKE '%$search%')";
+}
+
+// กรองตามคอลัมน์รหัสกรมบัญชีกลาง
+if (!empty($filterRefCode)) {
+    $where .= " AND UPPER(REF_CODE) LIKE '%$filterRefCode%'";
+}
+
+// กรองตามคอลัมน์รหัสสปสช
+if (!empty($filterCode30)) {
+    $where .= " AND UPPER(CODE_30) LIKE '%$filterCode30%'";
+}
+
+// กรองค่าว่างรหัสกรมบัญชีกลาง
+if ($filterEmptyRef === 'true') {
+    $where .= " AND (REF_CODE IS NULL OR REF_CODE = '')";
+}
+
+// กรองค่าว่างรหัสสปสช
+if ($filterEmptyCode30 === 'true') {
+    $where .= " AND (CODE_30 IS NULL OR CODE_30 = '')";
 }
 
 $sql_total = "SELECT COUNT(*) AS CNT FROM SERVICE_CODES $where";

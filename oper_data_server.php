@@ -12,6 +12,12 @@ $searchValue = isset($_GET['search']['value']) ? trim($_GET['search']['value']) 
 $orderColumnIndex = isset($_GET['order'][0]['column']) ? intval($_GET['order'][0]['column']) : 2;
 $orderDir = isset($_GET['order'][0]['dir']) ? $_GET['order'][0]['dir'] : 'asc';
 
+// รับค่าจากตัวกรองคอลัมน์
+$filterRefCode = isset($_GET['filterRefCode']) ? strtoupper($_GET['filterRefCode']) : '';
+$filterCode30 = isset($_GET['filterCode30']) ? strtoupper($_GET['filterCode30']) : '';
+$filterEmptyRef = isset($_GET['filterEmptyRef']) ? $_GET['filterEmptyRef'] : '';
+$filterEmptyCode30 = isset($_GET['filterEmptyCode30']) ? $_GET['filterEmptyCode30'] : '';
+
 // Mapping คอลัมน์จาก DataTables มาเป็นชื่อคอลัมน์จริงใน Oracle
 $columns = [
     0 => 'OPER_CODE',
@@ -36,6 +42,26 @@ if ($searchValue != '') {
         UPPER(OPER_CODE) LIKE '%$searchText%' OR 
         UPPER(NAME) LIKE '%$searchText%'
     )";
+}
+
+// กรองตามคอลัมน์รหัสกรมบัญชีกลาง
+if (!empty($filterRefCode)) {
+    $searchSQL .= " AND UPPER(REF_CODE) LIKE '%$filterRefCode%'";
+}
+
+// กรองตามคอลัมน์รหัสสปสช
+if (!empty($filterCode30)) {
+    $searchSQL .= " AND UPPER(CODE_30) LIKE '%$filterCode30%'";
+}
+
+// กรองค่าว่างรหัสกรมบัญชีกลาง
+if ($filterEmptyRef === 'true') {
+    $searchSQL .= " AND (REF_CODE IS NULL OR REF_CODE = '')";
+}
+
+// กรองค่าว่างรหัสสปสช
+if ($filterEmptyCode30 === 'true') {
+    $searchSQL .= " AND (CODE_30 IS NULL OR CODE_30 = '')";
 }
 
 // Query สำหรับนับจำนวนทั้งหมด

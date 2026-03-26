@@ -15,6 +15,42 @@ include('main_top_panel_head.php');          // ส่วนหัว
             <i class="fa fa-hand-holding-medical me-2"></i> รายการค่าบริการ
         </h4>
         <div class="table-responsive">
+            <div class="mb-3">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">รหัสกรมบัญชีกลาง</label>
+                        <input type="text" class="form-control form-control-sm" id="filterRefCode" placeholder="กรองรหัสกรมบัญชีกลาง...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">รหัสสปสช</label>
+                        <input type="text" class="form-control form-control-sm" id="filterCode30" placeholder="กรองรหัสสปสช...">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted">&nbsp;</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterEmptyRef">
+                            <label class="form-check-label small" for="filterEmptyRef">
+                                แสดงรหัสกรมบัญชีกลางว่าง
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted">&nbsp;</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterEmptyCode30">
+                            <label class="form-check-label small" for="filterEmptyCode30">
+                                แสดงรหัสสปสชว่าง
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted">&nbsp;</label>
+                        <button type="button" class="btn btn-outline-secondary btn-sm w-100" onclick="clearFilters()">
+                            <i class="fa fa-times me-1"></i> ล้างตัวกรอง
+                        </button>
+                    </div>
+                </div>
+            </div>
             <table id="serviceTable" class="table table-bordered table-hover table-striped nowrap" style="width:100%">
                 <thead class="table-light text-center align-middle">
                     <tr>
@@ -64,10 +100,18 @@ $.ajax({
 });
 
 $(document).ready(function() {
-    $('#serviceTable').DataTable({
+    var table = $('#serviceTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: './service_data_server.php',
+        ajax: {
+            url: './service_data_server.php',
+            data: function(d) {
+                d.filterRefCode = $('#filterRefCode').val();
+                d.filterCode30 = $('#filterCode30').val();
+                d.filterEmptyRef = $('#filterEmptyRef').is(':checked');
+                d.filterEmptyCode30 = $('#filterEmptyCode30').is(':checked');
+            }
+        },
         responsive: true,
         pageLength: 20,
         order: [
@@ -155,7 +199,24 @@ $(document).ready(function() {
             }
         ]
     });
+
+    // Event listeners for column filters
+    $('#filterRefCode, #filterCode30').on('keyup change', function() {
+        table.draw();
+    });
+
+    $('#filterEmptyRef, #filterEmptyCode30').on('change', function() {
+        table.draw();
+    });
 });
+
+function clearFilters() {
+    $('#filterRefCode').val('');
+    $('#filterCode30').val('');
+    $('#filterEmptyRef').prop('checked', false);
+    $('#filterEmptyCode30').prop('checked', false);
+    $('#serviceTable').DataTable().draw();
+}
 
 function openStatusModal(code) {
     $.ajax({

@@ -16,6 +16,29 @@ include('main_top_panel_head.php');  // Header UI
             <i class="fa fa-puzzle-piece me-2"></i> รายการค่าบริการอื่นๆ (Miscellaneous)
         </h4>
         <div class="table-responsive">
+            <div class="mb-3">
+                <div class="row g-2">
+                    <div class="col-md-8">
+                        <label class="form-label small text-muted">ค้นหาเพิ่มเติม</label>
+                        <input type="text" class="form-control form-control-sm" id="filterExtra" placeholder="ค้นหารหัสหรือชื่อรายการเพิ่มเติม...">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted">&nbsp;</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterEmptyCode">
+                            <label class="form-check-label small" for="filterEmptyCode">
+                                แสดงรหัสว่าง
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted">&nbsp;</label>
+                        <button type="button" class="btn btn-outline-secondary btn-sm w-100" onclick="clearFilters()">
+                            <i class="fa fa-times me-1"></i> ล้างตัวกรอง
+                        </button>
+                    </div>
+                </div>
+            </div>
             <table id="miscTable" class="table table-bordered table-hover table-striped nowrap" style="width:100%">
                 <thead class="table-light text-center align-middle">
                     <tr>
@@ -66,10 +89,16 @@ $.ajax({
 });
 
 $(document).ready(function() {
-    $('#miscTable').DataTable({
+    var table = $('#miscTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: './misc_data_server.php',
+        ajax: {
+            url: './misc_data_server.php',
+            data: function(d) {
+                d.filterExtra = $('#filterExtra').val();
+                d.filterEmptyCode = $('#filterEmptyCode').is(':checked');
+            }
+        },
         responsive: true,
         pageLength: 20,
         order: [
@@ -151,7 +180,22 @@ return `<button
             }
         ]
     });
+
+    // Event listeners for column filters
+    $('#filterExtra').on('keyup change', function() {
+        table.draw();
+    });
+
+    $('#filterEmptyCode').on('change', function() {
+        table.draw();
+    });
 });
+
+function clearFilters() {
+    $('#filterExtra').val('');
+    $('#filterEmptyCode').prop('checked', false);
+    $('#miscTable').DataTable().draw();
+}
 
 function openStatusModal(code) {
     $.ajax({

@@ -21,9 +21,23 @@ $order_col = isset($_GET['order'][0]['column']) ? intval($_GET['order'][0]['colu
 $order_dir = isset($_GET['order'][0]['dir']) ? $_GET['order'][0]['dir'] : 'asc';
 $order_by = $columns[$order_col];
 
+// รับค่าจากตัวกรองเพิ่มเติม
+$filterExtra = isset($_GET['filterExtra']) ? strtoupper($_GET['filterExtra']) : '';
+$filterEmptyCode = isset($_GET['filterEmptyCode']) ? $_GET['filterEmptyCode'] : '';
+
 $where = "WHERE DEL_FLAG IS NULL";
 if (!empty($search)) {
     $where .= " AND (UPPER(MISC_CODE) LIKE '%$search%' OR UPPER(NAME) LIKE '%$search%')";
+}
+
+// กรองเพิ่มเติม
+if (!empty($filterExtra)) {
+    $where .= " AND (UPPER(MISC_CODE) LIKE '%$filterExtra%' OR UPPER(NAME) LIKE '%$filterExtra%')";
+}
+
+// กรองค่าว่างรหัส
+if ($filterEmptyCode === 'true') {
+    $where .= " AND (MISC_CODE IS NULL OR MISC_CODE = '')";
 }
 
 $sql_total = "SELECT COUNT(*) AS CNT FROM MISC_CODES $where";
