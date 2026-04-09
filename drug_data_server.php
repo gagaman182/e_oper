@@ -31,6 +31,7 @@ $filterRefCode = isset($_GET['filterRefCode']) ? strtoupper($_GET['filterRefCode
 $filterCode30 = isset($_GET['filterCode30']) ? strtoupper($_GET['filterCode30']) : '';
 $filterEmptyRef = isset($_GET['filterEmptyRef']) ? $_GET['filterEmptyRef'] : '';
 $filterEmptyCode30 = isset($_GET['filterEmptyCode30']) ? $_GET['filterEmptyCode30'] : '';
+$filterEmptyDrugStd = isset($_GET['filterEmptyDrugStd']) ? $_GET['filterEmptyDrugStd'] : '';
 
 // กรอง DEL_FLAG
 $where = "WHERE DEL_FLAG IS NULL";
@@ -56,6 +57,11 @@ if ($filterEmptyRef === 'true') {
 // กรองค่าว่างรหัสสปสช
 if ($filterEmptyCode30 === 'true') {
     $where .= " AND (CODE_30 IS NULL OR CODE_30 = '')";
+}
+
+// กรองค่าว่างรหัสยา 24 หลัก
+if ($filterEmptyDrugStd === 'true') {
+    $where .= " AND (DRUG_STD_CODE IS NULL OR DRUG_STD_CODE = '')";
 }
 
 // นับจำนวนทั้งหมด

@@ -45,6 +45,15 @@ include('main_top_panel_head.php');
                     </div>
                     <div class="col-md-2">
                         <label class="form-label small text-muted">&nbsp;</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterEmptyDrugStd">
+                            <label class="form-check-label small" for="filterEmptyDrugStd">
+                                แสดงรหัสยา 24 หลักว่าง
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted">&nbsp;</label>
                         <button type="button" class="btn btn-outline-secondary btn-sm w-100" onclick="clearFilters()">
                             <i class="fa fa-times me-1"></i> ล้างตัวกรอง
                         </button>
@@ -115,6 +124,7 @@ $(document).ready(function() {
                 d.filterCode30 = $('#filterCode30').val();
                 d.filterEmptyRef = $('#filterEmptyRef').is(':checked');
                 d.filterEmptyCode30 = $('#filterEmptyCode30').is(':checked');
+                d.filterEmptyDrugStd = $('#filterEmptyDrugStd').is(':checked');
             }
         },
         responsive: false,
@@ -215,7 +225,7 @@ $(document).ready(function() {
         table.draw();
     });
 
-    $('#filterEmptyRef, #filterEmptyCode30').on('change', function() {
+    $('#filterEmptyRef, #filterEmptyCode30, #filterEmptyDrugStd').on('change', function() {
         table.draw();
     });
 });
@@ -225,6 +235,7 @@ function clearFilters() {
     $('#filterCode30').val('');
     $('#filterEmptyRef').prop('checked', false);
     $('#filterEmptyCode30').prop('checked', false);
+    $('#filterEmptyDrugStd').prop('checked', false);
     $('#drugTable').DataTable().draw();
 }
 
