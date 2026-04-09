@@ -11,7 +11,7 @@ $filterEmptyCode30 = isset($_GET['filterEmptyCode30']) ? $_GET['filterEmptyCode3
 
 $searchSQL = "";
 if ($searchValue != '') {
-    $searchSQL .= " AND (UPPER(XRAY_CODE) LIKE '%$searchValue%' OR UPPER(NAME) LIKE '%$searchValue%')";
+    $searchSQL .= " AND (UPPER(CODE) LIKE '%$searchValue%' OR UPPER(NAME) LIKE '%$searchValue%')";
 }
 if (!empty($filterRefCode)) {
     $searchSQL .= " AND UPPER(REF_CODE) LIKE '%$filterRefCode%'";
@@ -26,8 +26,9 @@ if ($filterEmptyCode30 === 'true') {
     $searchSQL .= " AND (CODE_30 IS NULL OR CODE_30 = '')";
 }
 
-$sql = "SELECT XRAY_CODE, REF_CODE, CODE_30, NAME, FUND_UNIT_PRICE, COPAY_UNIT_PRICE, MIN_PRICE, MAX_PRICE
-        FROM XRAY_CODES
+$sql = "SELECT CODE, REF_CODE, CODE_30, DRUG_STD_CODE, NAME,
+               FUND_UNIT_PRICE, INTEND_FUND_UNIT_PRICE, SELL_UNIT_PRICE, IPD_SELL_UNIT_PRICE
+        FROM DRUGCODES
         WHERE DEL_FLAG IS NULL $searchSQL
         ORDER BY REF_CODE ASC";
 
@@ -37,7 +38,7 @@ if (!oci_execute($stmt)) {
     die('Query Error: ' . $e['message']);
 }
 
-$filename = 'export_xray_' . date('Ymd_His') . '.csv';
+$filename = 'export_drug_' . date('Ymd_His') . '.csv';
 header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Cache-Control: no-cache, no-store, must-revalidate');
@@ -47,7 +48,7 @@ header('Expires: 0');
 $output = fopen('php://output', 'w');
 fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-fputcsv($output, array('#', 'รหัส', 'รหัสกรมบัญชีกลาง', 'รหัสสปสช', 'ชื่อรายการ', 'ราคาทุน', 'ร่วมจ่าย', 'ต่ำสุด', 'สูงสุด'));
+fputcsv($output, array('#', 'รหัส', 'รหัสกรมบัญชีกลาง', 'รหัสสปสช', 'รหัสยา 24 หลัก', 'ชื่อรายการ', 'ราคาทุน', 'ร่วมจ่าย', 'ต่ำสุด', 'สูงสุด'));
 
 $i = 1;
 while ($row = oci_fetch_array($stmt, OCI_ASSOC + OCI_RETURN_NULLS)) {
@@ -55,14 +56,15 @@ while ($row = oci_fetch_array($stmt, OCI_ASSOC + OCI_RETURN_NULLS)) {
     $code30  = isset($row['CODE_30'])  ? $row['CODE_30']  : '';
     fputcsv($output, array(
         $i++,
-        isset($row['XRAY_CODE']) ? $row['XRAY_CODE'] : '',
+        isset($row['CODE'])               ? $row['CODE']               : '',
         ($refCode !== '') ? '="' . $refCode . '"' : '',
         ($code30  !== '') ? '="' . $code30  . '"' : '',
-        isset($row['NAME'])      ? $row['NAME']      : '',
-        number_format((float)(isset($row['FUND_UNIT_PRICE'])  ? $row['FUND_UNIT_PRICE']  : 0), 2),
-        number_format((float)(isset($row['COPAY_UNIT_PRICE']) ? $row['COPAY_UNIT_PRICE'] : 0), 2),
-        number_format((float)(isset($row['MIN_PRICE'])        ? $row['MIN_PRICE']        : 0), 2),
-        number_format((float)(isset($row['MAX_PRICE'])        ? $row['MAX_PRICE']        : 0), 2),
+        isset($row['DRUG_STD_CODE'])      ? $row['DRUG_STD_CODE']      : '',
+        isset($row['NAME'])               ? $row['NAME']               : '',
+        number_format((float)(isset($row['FUND_UNIT_PRICE'])        ? $row['FUND_UNIT_PRICE']        : 0), 2),
+        number_format((float)(isset($row['INTEND_FUND_UNIT_PRICE']) ? $row['INTEND_FUND_UNIT_PRICE'] : 0), 2),
+        number_format((float)(isset($row['SELL_UNIT_PRICE'])        ? $row['SELL_UNIT_PRICE']        : 0), 2),
+        number_format((float)(isset($row['IPD_SELL_UNIT_PRICE'])    ? $row['IPD_SELL_UNIT_PRICE']    : 0), 2),
     ));
 }
 

@@ -123,9 +123,11 @@ $(document).ready(function() {
         ],
         dom: '<"d-flex justify-content-between align-items-center mb-3"Bf>rt<"d-flex justify-content-between align-items-center mt-3"lip>',
         buttons: [{
-                extend: 'excelHtml5',
-                text: '<i class="fa fa-file-excel me-1"></i> Excel',
-                className: 'btn btn-success btn-sm rounded-pill'
+                text: '<i class="fa fa-file-excel me-1"></i> Excel (ทั้งหมด)',
+                className: 'btn btn-success btn-sm rounded-pill',
+                action: function(e, dt, node, config) {
+                    exportToExcel();
+                }
             },
             {
                 extend: 'print',
@@ -220,6 +222,19 @@ function clearFilters() {
     $('#filterEmptyRef').prop('checked', false);
     $('#filterEmptyCode30').prop('checked', false);
     $('#labTable').DataTable().draw();
+}
+
+function exportToExcel() {
+    var dt = $('#labTable').DataTable();
+    var searchVal = dt.search();
+    var params = new URLSearchParams({
+        search:           searchVal,
+        filterRefCode:    $('#filterRefCode').val(),
+        filterCode30:     $('#filterCode30').val(),
+        filterEmptyRef:   $('#filterEmptyRef').is(':checked') ? 'true' : 'false',
+        filterEmptyCode30: $('#filterEmptyCode30').is(':checked') ? 'true' : 'false'
+    });
+    window.location.href = 'export_lab_excel.php?' + params.toString();
 }
 
 function openStatusModal(code) {
