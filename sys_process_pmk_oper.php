@@ -12,9 +12,15 @@ include('main_top_panel_head.php');          // ส่วนหัว
 <!-- ส่วนแสดงผล -->
 <div class="container-fluid py-4">
     <div class="card p-4">
-        <h4 class="mb-3 text-primary">
-            <i class="fa fa-vials me-2"></i> รายการ ค่าผ่าตัด/ดมยา/วัสดุการแพทย์
-        </h4>
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h4 class="mb-0 text-primary">
+                <i class="fa fa-vials me-2"></i> รายการ ค่าผ่าตัด/ดมยา/วัสดุการแพทย์
+            </h4>
+            <a href="http://192.168.99.225/ARManager/instrument-skn/" target="_blank"
+               class="btn btn-outline-primary btn-sm rounded-pill">
+                <i class="fa fa-external-link-alt me-1"></i> ตารางข้อมูลอวัยวะเทียม/อุปกรณ์การแพทย์
+            </a>
+        </div>
         <div class="table-responsive">
             <div class="mb-3">
                 <div class="row g-2">
